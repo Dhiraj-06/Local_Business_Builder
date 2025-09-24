@@ -1,0 +1,63 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+.builder-container {
+    display: flex;
+    height: 100vh;
+}
+
+.sidebar {
+    width: 250px;
+    background: #f5f5f5;
+    padding: 20px;
+    border-right: 2px solid #ddd;
+}
+
+.component {
+    padding: 10px;
+    margin: 10px 0;
+    background: white;
+    border: 1px solid #ccc;
+    cursor: move;
+    border-radius: 5px;
+}
+
+.canvas {
+    flex: 1;
+    padding: 20px;
+    background: #f9f9f9;
+    border: 2px dashed #ccc;
+    min-height: 500px;
+}
+
+.preview {
+    width: 300px;
+    background: #fff;
+    padding: 20px;
+    border-left: 2px solid #ddd;
+}
+
+.canvas-component {
+    margin: 10px 0;
+    padding: 15px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.hero-section { background: #e3f2fd; }
+.contact-form { background: #f3e5f5; }
+.product-grid { background: #e8f5e8; }
+.gallery { background: #fff3e0; }
+
+button {
+    padding: 10px 20px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}

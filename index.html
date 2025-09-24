@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local Business Website Builder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .drag-item {
+            transition: all 0.2s ease;
+        }
+        .drag-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .drop-zone {
+            min-height: 100px;
+            transition: all 0.3s ease;
+        }
+        .drop-zone.drag-over {
+            background: linear-gradient(45deg, #f3f4f6, #e5e7eb);
+            border: 2px dashed #3b82f6;
+        }
+        .preview-mode .component {
+            border: none !important;
+        }
+        .edit-mode .component {
+            border: 2px dashed transparent;
+            cursor: pointer;
+            position: relative;
+        }
+        .edit-mode .component:hover {
+            border: 2px dashed #3b82f6;
+        }
+        .component-controls {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            display: none;
+            z-index: 10;
+        }
+        .edit-mode .component:hover .component-controls {
+            display: flex;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-80 bg-white shadow-lg flex flex-col">
+            <!-- Header -->
+            <div class="p-4 border-b">
+                <h1 class="text-xl font-bold text-gray-800">Website Builder</h1>
+                <div class="mt-2 flex gap-2">
+                    <button id="previewBtn" class="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600">
+                        <i class="fas fa-eye mr-1"></i> Preview
+                    </button>
+                    <button id="editBtn" class="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600">
+                        <i class="fas fa-edit mr-1"></i> Edit
+                    </button>
+                    <button id="publishBtn" class="px-3 py-1 bg-purple-500 text-white rounded text-sm hover:bg-purple-600">
+                        <i class="fas fa-globe mr-1"></i> Publish
+                    </button>
+                </div>
+            </div>
+
+            <!-- Templates Section -->
+            <div class="p-4 border-b">
+                <h3 class="font-semibold mb-2">Templates</h3>
+                <div class="grid grid-cols-1 gap-2">
+                    <button class="template-btn p-2 border rounded hover:bg-gray-50 text-left" data-template="salon">
+                        <i class="fas fa-cut mr-2 text-pink-500"></i> Hair Salon
+                    </button>
+                    <button class="template-btn p-2 border rounded hover:bg-gray-50 text-left" data-template="bakery">
+                        <i class="fas fa-birthday-cake mr-2 text-orange-500"></i> Bakery
+                    </button>
+                    <button class="template-btn p-2 border rounded hover:bg-gray-50 text-left" data-template="gym">
+                        <i class="fas fa-dumbbell mr-2 text-red-500"></i> Fitness Gym
+                    </button>
+                    <button class="template-btn p-2 border rounded hover:bg-gray-50 text-left" data-template="coaching">
+                        <i class="fas fa-graduation-cap mr-2 text-blue-500"></i> Coaching Center
+                    </button>
+                </div>
+            </div>
+
+            <!-- Components Section -->
+            <div class="p-4 flex-1">
+                <h3 class="font-semibold mb-2">Components</h3>
+                <div class="space-y-2">
+                    <div class="drag-item p-2 bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded cursor-grab" 
+                         draggable="true" data-component="navbar">
+                        <i class="fas fa-bars mr-2 text-blue-600"></i> Navigation Bar
+                    </div>
+                    <div class="drag-item p-2 bg-gradient-to-r from-green-50 to-green-100 border border-green-200 rounded cursor-grab" 
+                         draggable="true" data-component="hero">
+                        <i class="fas fa-star mr-2 text-green-600"></i> Hero Section
+                    </div>
+                    <div class="drag-item p-2 bg-gradient-to-r from-purple-50 to-purple-100 border border-purple-200 rounded cursor-grab" 
+                         draggable="true" data-component="services">
+                        <i class="fas fa-concierge-bell mr-2 text-purple-600"></i> Services
+                    </div>
+                    <div class="drag-item p-2 bg-gradient-to-r from-yellow-50 to-yellow-100 border border-yellow-200 rounded cursor-grab" 
+                         draggable="true" data-component="gallery">
+                        <i class="fas fa-images mr-2 text-yellow-600"></i> Photo Gallery
+                    </div>
+                    <div class="drag-item p-2 bg-gradient-to-r from-red-50 to-red-100 border border-red-200 rounded cursor-grab" 
+                         draggable="true" data-component="contact">
+                        <i class="fas fa-envelope mr-2 text-red-600"></i> Contact Form
+                    </div>
+                    <div class="drag-item p-2 bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded cursor-grab" 
+                         draggable="true" data-component="footer">
+                        <i class="fas fa-grip-lines mr-2 text-gray-600"></i> Footer
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Canvas -->
+        <div class="flex-1 flex flex-col">
+            <div class="bg-white p-4 border-b shadow-sm">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-lg font-semibold">Canvas</h2>
+                    <div class="flex gap-2">
+                        <button id="clearCanvas" class="px-3 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600">
+                            <i class="fas fa-trash mr-1"></i> Clear
+                        </button>
+                        <button id="saveLayout" class="px-3 py-1 bg-gray-500 text-white rounded text-sm hover:bg-gray-600">
+                            <i class="fas fa-save mr-1"></i> Save Layout
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="canvas" class="flex-1 overflow-auto bg-white drop-zone edit-mode" style="min-height: 600px;">
+                <div class="text-center text-gray-400 mt-20">
+                    <i class="fas fa-plus-circle text-4xl mb-4"></i>
+                    <p class="text-lg">Drag components here to build your website</p>
+                    <p class="text-sm">Or select a template to get started</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Component Edit Modal -->
+    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-lg max-w-md w-full mx-4">
+            <h3 class="text-lg font-semibold mb-4">Edit Component</h3>
+            <div id="editForm"></div>
+            <div class="mt-4 flex justify-end gap-2">
+                <button id="cancelEdit" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">Cancel</button>
+                <button id="saveEdit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class WebsiteBuilder {
+            constructor() {
+                this.canvas = document.getElementById('canvas');
+                this.isPreviewMode = false;
+                this.currentEditingElement = null;
+                this.componentData = {};
+                
+                this.initEventListeners();
+                this.initDragAndDrop();
+            }
+
+            initEventListeners() {
+                // Mode buttons
+                document.getElementById('previewBtn').addEventListener('click', () => this.togglePreview(true));
+                document.getElementById('editBtn').addEventListener('click', () => this.togglePreview(false));
+                document.getElementById('publishBtn').addEventListener('click', () => this.publishWebsite());
+                
+                // Canvas actions
+                document.getElementById('clearCanvas').addEventListener('click', () => this.clearCanvas());
+                document.getElementById('saveLayout').addEventListener('click', () => this.saveLayout());
+                
+                // Template buttons
+                document.querySelectorAll('.template-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const template = e.target.getAttribute('data-template');
+                        this.loadTemplate(template);
+                    });
+                });
+
+                // Edit modal
+                document.getElementById('cancelEdit').addEventListener('click', () => this.closeEditModal());
+                document.getElementById('saveEdit').addEventListener('click', () => this.saveComponentEdit());
+            }
+
+            initDragAndDrop() {
+                const dragItems = document.querySelectorAll('.drag-item');
+                
+                dragItems.forEach(item => {
+                    item.addEventListener('dragstart', (e) => {
+                        e.dataTransfer.setData('text/plain', e.target.getAttribute('data-component'));
+                    });
+                });
+
+                this.canvas.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    this.canvas.classList.add('drag-over');
+                });
+
+                this.canvas.addEventListener('dragleave', () => {
+                    this.canvas.classList.remove('drag-over');
+                });
+
+                this.canvas.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    this.canvas.classList.remove('drag-over');
+                    const componentType = e.dataTransfer.getData('text/plain');
+                    this.addComponent(componentType);
+                });
+            }
+
+            addComponent(type) {
+                if (this.canvas.innerHTML.includes('text-center text-gray-400')) {
+                    this.canvas.innerHTML = '';
+                }
+
+                const componentId = 'comp_' + Date.now();
+                const component = this.createComponent(type, componentId);
+                this.canvas.appendChild(component);
+            }
+
+            createComponent(type, id, data = {}) {
+                const div = document.createElement('div');
+                div.className = 'component';
+                div.setAttribute('data-id', id);
+                div.setAttribute('data-type', type);
+
+                // Add component controls
+                const controls = document.createElement('div');
+                controls.className = 'component-controls bg-white border rounded shadow-lg';
+                controls.innerHTML = `
+                    <button class="edit-comp px-2 py-1 text-blue-500 hover:bg-blue-50 rounded-l" title="Edit">
+                        <i class="fas fa-edit text-xs"></i>
+                    </button>
+                    <button class="delete-comp px-2 py-1 text-red-500 hover:bg-red-50 rounded-r" title="Delete">
+                        <i class="fas fa-trash text-xs"></i>
+                    </button>
+                `;
+                
+                controls.querySelector('.edit-comp').addEventListener('click', () => this.editComponent(div));
+                controls.querySelector('.delete-comp').addEventListener('click', () => div.remove());
+                
+                div.appendChild(controls);
+
+                switch(type) {
+                    case 'navbar':
+                        div.innerHTML += this.createNavbar(data);
+                        break;
+                    case 'hero':
+                        div.innerHTML += this.createHero(data);
+                        break;
+                    case 'services':
+                        div.innerHTML += this.createServices(data);
+                        break;
+                    case 'gallery':
+                        div.innerHTML += this.createGallery(data);
+                        break;
+                    case 'contact':
+                        div.innerHTML += this.createContact(data);
+                        break;
+                    case 'footer':
+                        div.innerHTML += this.createFooter(data);
+                        break;
+                }
+
+                return div;
+            }
+
+            createNavbar(data = {}) {
+                const brandName = data.brandName || 'Your Business';
+                const menuItems = data.menuItems || ['Home', 'Services', 'About', 'Contact'];
+                
+                return `
+                    <nav class="bg-white shadow-lg">
+                        <div class="max-w-7xl mx-auto px-4">
+                            <div class="flex justify-between items-center py-4">
+                                <div class="text-xl font-bold text-gray-800">${brandName}</div>
+                                <div class="hidden md:flex space-x-6">
+                                    ${menuItems.map(item => `<a href="#" class="text-gray-600 hover:text-blue-600">${item}</a>`).join('')}
+                                </div>
+                                <button class="md:hidden">
+                                    <i class="fas fa-bars text-gray-600"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </nav>
+                `;
+            }
+
+            createHero(data = {}) {
+                const title = data.title || 'Welcome to Our Business';
+                const subtitle = data.subtitle || 'We provide excellent services for your needs';
+                const bgColor = data.bgColor || 'bg-gradient-to-r from-blue-600 to-purple-600';
+                
+                return `
+                    <section class="${bgColor} text-white py-20">
+                        <div class="max-w-7xl mx-auto px-4 text-center">
+                            <h1 class="text-4xl md:text-6xl font-bold mb-4">${title}</h1>
+                            <p class="text-xl mb-8">${subtitle}</p>
+                            <button class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">
+                                Get Started
+                            </button>
+                        </div>
+                    </section>
+                `;
+            }
+
+            createServices(data = {}) {
+                const title = data.title || 'Our Services';
+                const services = data.services || [
+                    { name: 'Service 1', description: 'Description of service 1', icon: 'fas fa-star' },
+                    { name: 'Service 2', description: 'Description of service 2', icon: 'fas fa-heart' },
+                    { name: 'Service 3', description: 'Description of service 3', icon: 'fas fa-check' }
+                ];
+
+                return `
+                    <section class="py-16 bg-gray-50">
+                        <div class="max-w-7xl mx-auto px-4">
+                            <h2 class="text-3xl font-bold text-center mb-12">${title}</h2>
+                            <div class="grid md:grid-cols-3 gap-8">
+                                ${services.map(service => `
+                                    <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                                        <i class="${service.icon} text-3xl text-blue-600 mb-4"></i>
+                                        <h3 class="text-xl font-semibold mb-2">${service.name}</h3>
+                                        <p class="text-gray-600">${service.description}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </section>
+                `;
+            }
+
+            createGallery(data = {}) {
+                return `
+                    <section class="py-16">
+                        <div class="max-w-7xl mx-auto px-4">
+                            <h2 class="text-3xl font-bold text-center mb-12">Gallery</h2>
+                            <div class="grid md:grid-cols-3 gap-4">
+                                ${Array(6).fill().map((_, i) => `
+                                    <div class="bg-gray-200 aspect-square rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-image text-4xl text-gray-400"></i>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </section>
+                `;
+            }
+
+            createContact(data = {}) {
+                const title = data.title || 'Contact Us';
+                
+                return `
+                    <section class="py-16 bg-gray-50">
+                        <div class="max-w-4xl mx-auto px-4">
+                            <h2 class="text-3xl font-bold text-center mb-12">${title}</h2>
+                            <div class="grid md:grid-cols-2 gap-8">
+                                <div>
+                                    <h3 class="text-xl font-semibold mb-4">Get in Touch</h3>
+                                    <div class="space-y-3">
+                                        <p><i class="fas fa-map-marker-alt text-blue-600 mr-2"></i> 123 Business Street, City, State</p>
+                                        <p><i class="fas fa-phone text-blue-600 mr-2"></i> (555) 123-4567</p>
+                                        <p><i class="fas fa-envelope text-blue-600 mr-2"></i> info@business.com</p>
+                                    </div>
+                                </div>
+                                <form class="space-y-4">
+                                    <input type="text" placeholder="Your Name" class="w-full p-3 border rounded-lg">
+                                    <input type="email" placeholder="Your Email" class="w-full p-3 border rounded-lg">
+                                    <textarea placeholder="Your Message" rows="4" class="w-full p-3 border rounded-lg"></textarea>
+                                    <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
+                                        Send Message
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </section>
+                `;
+            }
+
+            createFooter(data = {}) {
+                const businessName = data.businessName || 'Your Business';
+                const year = new Date().getFullYear();
+                
+                return `
+                    <footer class="bg-gray-800 text-white py-8">
+                        <div class="max-w-7xl mx-auto px-4">
+                            <div class="grid md:grid-cols-3 gap-8">
+                                <div>
+                                    <h3 class="text-xl font-bold mb-4">${businessName}</h3>
+                                    <p class="text-gray-300">Providing excellent services since ${year}.</p>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold mb-4">Quick Links</h4>
+                                    <ul class="space-y-2 text-gray-300">
+                                        <li><a href="#" class="hover:text-white">Home</a></li>
+                                        <li><a href="#" class="hover:text-white">Services</a></li>
+                                        <li><a href="#" class="hover:text-white">About</a></li>
+                                        <li><a href="#" class="hover:text-white">Contact</a></li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold mb-4">Follow Us</h4>
+                                    <div class="flex space-x-3">
+                                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-facebook text-xl"></i></a>
+                                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-twitter text-xl"></i></a>
+                                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-instagram text-xl"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-300">
+                                <p>&copy; ${year} ${businessName}. All rights reserved.</p>
+                            </div>
+                        </div>
+                    </footer>
+                `;
+            }
+
+            loadTemplate(templateType) {
+                this.clearCanvas();
+                
+                const templates = {
+                    salon: {
+                        components: [
+                            { type: 'navbar', data: { brandName: 'Elegant Hair Salon', menuItems: ['Home', 'Services', 'Gallery', 'Book Now', 'Contact'] } },
+                            { type: 'hero', data: { title: 'Beautiful Hair Starts Here', subtitle: 'Professional styling and treatments for your perfect look', bgColor: 'bg-gradient-to-r from-pink-500 to-purple-600' } },
+                            { type: 'services', data: { 
+                                title: 'Our Services',
+                                services: [
+                                    { name: 'Hair Cut & Styling', description: 'Professional cuts and styling for all hair types', icon: 'fas fa-cut' },
+                                    { name: 'Hair Coloring', description: 'Expert coloring and highlighting services', icon: 'fas fa-palette' },
+                                    { name: 'Hair Treatment', description: 'Nourishing treatments for healthy hair', icon: 'fas fa-spa' }
+                                ]
+                            }},
+                            { type: 'gallery', data: {} },
+                            { type: 'contact', data: { title: 'Book Your Appointment' } },
+                            { type: 'footer', data: { businessName: 'Elegant Hair Salon' } }
+                        ]
+                    },
+                    bakery: {
+                        components: [
+                            { type: 'navbar', data: { brandName: 'Sweet Dreams Bakery', menuItems: ['Home', 'Menu', 'Custom Orders', 'About', 'Contact'] } },
+                            { type: 'hero', data: { title: 'Fresh Baked Daily', subtitle: 'Artisan breads, pastries, and custom cakes made with love', bgColor: 'bg-gradient-to-r from-orange-500 to-red-500' } },
+                            { type: 'services', data: { 
+                                title: 'Our Specialties',
+                                services: [
+                                    { name: 'Fresh Bread', description: 'Daily baked artisan breads and rolls', icon: 'fas fa-bread-slice' },
+                                    { name: 'Custom Cakes', description: 'Beautiful cakes for special occasions', icon: 'fas fa-birthday-cake' },
+                                    { name: 'Pastries', description: 'Delicious pastries and sweet treats', icon: 'fas fa-cookie-bite' }
+                                ]
+                            }},
+                            { type: 'gallery', data: {} },
+                            { type: 'contact', data: { title: 'Visit Our Bakery' } },
+                            { type: 'footer', data: { businessName: 'Sweet Dreams Bakery' } }
+                        ]
+                    },
+                    gym: {
+                        components: [
+                            { type: 'navbar', data: { brandName: 'FitLife Gym', menuItems: ['Home', 'Classes', 'Memberships', 'Trainers', 'Contact'] } },
+                            { type: 'hero', data: { title: 'Transform Your Body', subtitle: 'State-of-the-art equipment and expert trainers to help you reach your goals', bgColor: 'bg-gradient-to-r from-red-600 to-orange-600' } },
+                            { type: 'services', data: { 
+                                title: 'Our Programs',
+                                services: [
+                                    { name: 'Personal Training', description: '1-on-1 training with certified professionals', icon: 'fas fa-dumbbell' },
+                                    { name: 'Group Classes', description: 'High-energy group fitness classes', icon: 'fas fa-users' },
+                                    { name: 'Nutrition Coaching', description: 'Meal planning and nutrition guidance', icon: 'fas fa-apple-alt' }
+                                ]
+                            }},
+                            { type: 'gallery', data: {} },
+                            { type: 'contact', data: { title: 'Start Your Fitness Journey' } },
+                            { type: 'footer', data: { businessName: 'FitLife Gym' } }
+                        ]
+                    },
+                    coaching: {
+                        components: [
+                            { type: 'navbar', data: { brandName: 'Excel Academy', menuItems: ['Home', 'Courses', 'Faculty', 'Results', 'Contact'] } },
+                            { type: 'hero', data: { title: 'Excellence in Education', subtitle: 'Expert coaching for competitive exams and academic success', bgColor: 'bg-gradient-to-r from-blue-600 to-indigo-600' } },
+                            { type: 'services', data: { 
+                                title: 'Our Courses',
+                                services: [
+                                    { name: 'JEE Preparation', description: 'Comprehensive coaching for engineering entrance', icon: 'fas fa-calculator' },
+                                    { name: 'NEET Coaching', description: 'Medical entrance exam preparation', icon: 'fas fa-stethoscope' },
+                                    { name: 'Academic Support', description: 'Board exam preparation and tutoring', icon: 'fas fa-book' }
+                                ]
+                            }},
+                            { type: 'gallery', data: {} },
+                            { type: 'contact', data: { title: 'Enroll Today' } },
+                            { type: 'footer', data: { businessName: 'Excel Academy' } }
+                        ]
+                    }
+                };
+
+                const template = templates[templateType];
+                if (template) {
+                    template.components.forEach(comp => {
+                        const componentId = 'comp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                        const element = this.createComponent(comp.type, componentId, comp.data);
+                        this.canvas.appendChild(element);
+                    });
+                }
+            }
+
+            togglePreview(isPreview) {
+                this.isPreviewMode = isPreview;
+                
+                if (isPreview) {
+                    this.canvas.className = 'flex-1 overflow-auto bg-white preview-mode';
+                    document.getElementById('previewBtn').classList.add('bg-blue-700');
+                    document.getElementById('editBtn').classList.remove('bg-green-700');
+                } else {
+                    this.canvas.className = 'flex-1 overflow-auto bg-white drop-zone edit-mode';
+                    document.getElementById('editBtn').classList.add('bg-green-700');
+                    document.getElementById('previewBtn').classList.remove('bg-blue-700');
+                }
+            }
+
+            editComponent(element) {
+                if (this.isPreviewMode) return;
+                
+                this.currentEditingElement = element;
+                const type = element.getAttribute('data-type');
+                const id = element.getAttribute('data-id');
+                
+                this.showEditModal(type, this.componentData[id] || {});
+            }
+
+            showEditModal(type, data) {
+                const modal = document.getElementById('editModal');
+                const form = document.getElementById('editForm');
+                
+                let formHTML = '';
+                
+                switch(type) {
+                    case 'navbar':
+                        formHTML = `
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-2">Brand Name</label>
+                                <input type="text" id="brandName" value="${data.brandName || ''}" class="w-full p-2 border rounded">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-2">Menu Items (comma separated)</label>
+                                <input type="text" id="menuItems" value="${(data.menuItems || []).join(', ')}" class="w-full p-2 border rounded">
+                            </div>
+                        `;
+                        break;
+                    case 'hero':
+                        formHTML = `
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-2">Title</label>
+                                <input type="text" id="title" value="${data.title || ''}" class="w-full p-2 border rounded">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-2">Subtitle</label>
+                                <input type="text" id="subtitle" value="${data.subtitle || ''}" class="w-full p-2 border rounded">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-2">Background Color</label>
+                                <select id="bgColor" class="w-full p-2 border rounded">
+                                    <option value="bg-gradient-to-r from-blue-600 to-purple-600">Blue to Purple</option>
+                                    <option value="bg-gradient-to-r from-pink-500 to-purple-600">Pink to Purple</option>
+                                    <option value="bg-gradient-to-r from-orange-500 to-red-500">Orange to Red</option>
+                                    <option value="bg-gradient-to-r from-green-500 to-blue-500">Green to Blue</option>
+                                </select>
+                            </div>
+                        `;
+                        break;
