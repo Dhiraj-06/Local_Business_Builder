@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Local Business Website Builder</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="static/style.css">
+</head>
+<body class="bg-gray-100">
+  <div class="max-w-5xl mx-auto py-6">
+    <h1 class="text-3xl font-bold mb-6">🏪 Website Builder</h1>
+
+    <!-- Builder Canvas -->
+    <div id="builder" class="border-2 border-dashed p-6 bg-white rounded-lg min-h-[200px]">
+      <p class="text-gray-400">Drag & drop elements here...</p>
+    </div>
+
+    <!-- Controls -->
+    <div class="mt-4 space-x-2">
+      <button id="addText" class="px-4 py-2 bg-blue-600 text-white rounded">Add Text</button>
+      <button id="addImage" class="px-4 py-2 bg-green-600 text-white rounded">Add Image</button>
+      <button id="aiContent" class="px-4 py-2 bg-purple-600 text-white rounded">AI Content</button>
+      <button id="aiImage" class="px-4 py-2 bg-pink-600 text-white rounded">AI Image</button>
+      <button id="publishSite" class="px-4 py-2 bg-orange-600 text-white rounded">Publish 🚀</button>
+    </div>
+
+    <!-- AI Output -->
+    <div id="aiOutput" class="mt-4"></div>
+
+    <!-- Publish Info -->
+    <div id="publishInfo" class="mt-6"></div>
+  </div>
+
+  <script src="builder.js"></script>
+</body>
+</html>

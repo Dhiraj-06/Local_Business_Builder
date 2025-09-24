@@ -43,6 +43,28 @@
         .edit-mode .component:hover .component-controls {
             display: flex;
         }
+        .ai-suggestions {
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .product-item {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 8px 0;
+        }
+        .template-preview {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 10px;
+            margin: 5px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .template-preview:hover {
+            border-color: #3b82f6;
+            transform: scale(1.02);
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -52,40 +74,70 @@
             <!-- Header -->
             <div class="p-4 border-b">
                 <h1 class="text-xl font-bold text-gray-800">Website Builder</h1>
-                <div class="mt-2 flex gap-2">
-                    <button id="previewBtn" class="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600">
+                <div class="mt-2 flex gap-2 flex-wrap">
+                    <button id="aiAssistant" class="px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded text-sm">
+                        <i class="fas fa-robot mr-1"></i> AI Assistant
+                    </button>
+                    <button id="previewBtn" class="px-3 py-1 bg-blue-500 text-white rounded text-sm">
                         <i class="fas fa-eye mr-1"></i> Preview
                     </button>
-                    <button id="editBtn" class="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600">
+                    <button id="editBtn" class="px-3 py-1 bg-green-500 text-white rounded text-sm">
                         <i class="fas fa-edit mr-1"></i> Edit
                     </button>
-                    <button id="publishBtn" class="px-3 py-1 bg-purple-500 text-white rounded text-sm hover:bg-purple-600">
+                    <button id="publishBtn" class="px-3 py-1 bg-purple-500 text-white rounded text-sm">
                         <i class="fas fa-globe mr-1"></i> Publish
                     </button>
                 </div>
             </div>
 
+            <!-- AI Suggestions Panel -->
+            <div id="aiPanel" class="hidden p-4 border-b ai-suggestions">
+                <h3 class="font-semibold mb-2"><i class="fas fa-lightbulb mr-2"></i>AI Suggestions</h3>
+                <div id="aiSuggestions" class="text-sm">
+                    <p>Click "AI Assistant" to get suggestions for your website!</p>
+                </div>
+                <button id="generateContent" class="w-full mt-2 bg-white text-purple-600 py-1 rounded text-xs">
+                    Generate Better Content
+                </button>
+            </div>
+
             <!-- Templates Section -->
             <div class="p-4 border-b">
                 <h3 class="font-semibold mb-2">Templates</h3>
-                <div class="grid grid-cols-1 gap-2">
-                    <button class="template-btn p-2 border rounded hover:bg-gray-50 text-left" data-template="salon">
-                        <i class="fas fa-cut mr-2 text-pink-500"></i> Hair Salon
-                    </button>
-                    <button class="template-btn p-2 border rounded hover:bg-gray-50 text-left" data-template="bakery">
-                        <i class="fas fa-birthday-cake mr-2 text-orange-500"></i> Bakery
-                    </button>
-                    <button class="template-btn p-2 border rounded hover:bg-gray-50 text-left" data-template="gym">
-                        <i class="fas fa-dumbbell mr-2 text-red-500"></i> Fitness Gym
-                    </button>
-                    <button class="template-btn p-2 border rounded hover:bg-gray-50 text-left" data-template="coaching">
-                        <i class="fas fa-graduation-cap mr-2 text-blue-500"></i> Coaching Center
-                    </button>
+                <div class="space-y-2">
+                    <div class="template-preview" data-template="salon">
+                        <div class="flex items-center">
+                            <i class="fas fa-cut mr-2 text-pink-500"></i>
+                            <span class="font-medium">Hair Salon</span>
+                        </div>
+                        <p class="text-xs text-gray-600 mt-1">Perfect for beauty and styling businesses</p>
+                    </div>
+                    <div class="template-preview" data-template="bakery">
+                        <div class="flex items-center">
+                            <i class="fas fa-birthday-cake mr-2 text-orange-500"></i>
+                            <span class="font-medium">Bakery</span>
+                        </div>
+                        <p class="text-xs text-gray-600 mt-1">Ideal for food and bakery businesses</p>
+                    </div>
+                    <div class="template-preview" data-template="gym">
+                        <div class="flex items-center">
+                            <i class="fas fa-dumbbell mr-2 text-red-500"></i>
+                            <span class="font-medium">Fitness Gym</span>
+                        </div>
+                        <p class="text-xs text-gray-600 mt-1">Great for fitness centers and gyms</p>
+                    </div>
+                    <div class="template-preview" data-template="coaching">
+                        <div class="flex items-center">
+                            <i class="fas fa-graduation-cap mr-2 text-blue-500"></i>
+                            <span class="font-medium">Coaching Center</span>
+                        </div>
+                        <p class="text-xs text-gray-600 mt-1">Perfect for educational institutions</p>
+                    </div>
                 </div>
             </div>
 
             <!-- Components Section -->
-            <div class="p-4 flex-1">
+            <div class="p-4 border-b">
                 <h3 class="font-semibold mb-2">Components</h3>
                 <div class="space-y-2">
                     <div class="drag-item p-2 bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded cursor-grab" 
@@ -114,18 +166,33 @@
                     </div>
                 </div>
             </div>
+
+            <!-- E-commerce Products Section -->
+            <div class="p-4 border-b">
+                <h3 class="font-semibold mb-2"><i class="fas fa-shopping-cart mr-2"></i>Products</h3>
+                <button id="addProduct" class="w-full p-2 bg-green-500 text-white rounded text-sm mb-2">
+                    <i class="fas fa-plus mr-1"></i> Add Product
+                </button>
+                <div id="productsList" class="space-y-2">
+                    <p class="text-sm text-gray-600 text-center">No products added yet</p>
+                </div>
+            </div>
         </div>
 
         <!-- Main Canvas -->
         <div class="flex-1 flex flex-col">
+            <!-- Enhanced Toolbar -->
             <div class="bg-white p-4 border-b shadow-sm">
                 <div class="flex justify-between items-center">
                     <h2 class="text-lg font-semibold">Canvas</h2>
                     <div class="flex gap-2">
-                        <button id="clearCanvas" class="px-3 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600">
+                        <button id="aiOptimize" class="px-3 py-1 bg-yellow-500 text-white rounded text-sm">
+                            <i class="fas fa-magic mr-1"></i> AI Optimize
+                        </button>
+                        <button id="clearCanvas" class="px-3 py-1 bg-red-500 text-white rounded text-sm">
                             <i class="fas fa-trash mr-1"></i> Clear
                         </button>
-                        <button id="saveLayout" class="px-3 py-1 bg-gray-500 text-white rounded text-sm hover:bg-gray-600">
+                        <button id="saveLayout" class="px-3 py-1 bg-gray-500 text-white rounded text-sm">
                             <i class="fas fa-save mr-1"></i> Save Layout
                         </button>
                     </div>
@@ -142,25 +209,67 @@
         </div>
     </div>
 
+    <!-- AI Assistant Modal -->
+    <div id="aiModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-lg max-w-md w-full mx-4">
+            <h3 class="text-lg font-semibold mb-4"><i class="fas fa-robot mr-2"></i>AI Assistant</h3>
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-2">What would you like to improve?</label>
+                <select id="aiTask" class="w-full p-2 border rounded">
+                    <option value="content">Generate Better Content</option>
+                    <option value="layout">Optimize Layout</option>
+                    <option value="seo">SEO Suggestions</option>
+                    <option value="products">Product Descriptions</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-2">Additional Instructions</label>
+                <textarea id="aiInstructions" class="w-full p-2 border rounded" rows="3" placeholder="Tell the AI what you need..."></textarea>
+            </div>
+            <div class="flex justify-end gap-2">
+                <button id="cancelAI" class="px-4 py-2 bg-gray-500 text-white rounded">Cancel</button>
+                <button id="generateAI" class="px-4 py-2 bg-purple-500 text-white rounded">Generate</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Management Modal -->
+    <div id="productModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-lg max-w-md w-full mx-4">
+            <h3 class="text-lg font-semibold mb-4">Add Product</h3>
+            <form id="productForm">
+                <div class="space-y-4">
+                    <input type="text" id="productName" placeholder="Product Name" class="w-full p-2 border rounded" required>
+                    <textarea id="productDescription" placeholder="Description" class="w-full p-2 border rounded" required></textarea>
+                    <input type="number" id="productPrice" placeholder="Price" step="0.01" class="w-full p-2 border rounded" required>
+                    <input type="text" id="productCategory" placeholder="Category" class="w-full p-2 border rounded" required>
+                    <button type="submit" class="w-full bg-green-500 text-white py-2 rounded">Add Product</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Component Edit Modal -->
     <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
         <div class="bg-white p-6 rounded-lg max-w-md w-full mx-4">
             <h3 class="text-lg font-semibold mb-4">Edit Component</h3>
             <div id="editForm"></div>
             <div class="mt-4 flex justify-end gap-2">
-                <button id="cancelEdit" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">Cancel</button>
-                <button id="saveEdit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Save</button>
+                <button id="cancelEdit" class="px-4 py-2 bg-gray-500 text-white rounded">Cancel</button>
+                <button id="saveEdit" class="px-4 py-2 bg-blue-500 text-white rounded">Save</button>
             </div>
         </div>
     </div>
 
     <script>
+        // Main Website Builder Class
         class WebsiteBuilder {
             constructor() {
                 this.canvas = document.getElementById('canvas');
                 this.isPreviewMode = false;
                 this.currentEditingElement = null;
                 this.componentData = {};
+                this.products = [];
                 
                 this.initEventListeners();
                 this.initDragAndDrop();
@@ -177,12 +286,23 @@
                 document.getElementById('saveLayout').addEventListener('click', () => this.saveLayout());
                 
                 // Template buttons
-                document.querySelectorAll('.template-btn').forEach(btn => {
+                document.querySelectorAll('.template-preview').forEach(btn => {
                     btn.addEventListener('click', (e) => {
-                        const template = e.target.getAttribute('data-template');
+                        const template = e.currentTarget.getAttribute('data-template');
                         this.loadTemplate(template);
                     });
                 });
+
+                // AI features
+                document.getElementById('aiAssistant').addEventListener('click', () => this.showAIModal());
+                document.getElementById('aiOptimize').addEventListener('click', () => this.optimizeWithAI());
+                document.getElementById('generateAI').addEventListener('click', () => this.generateAIContent());
+                document.getElementById('cancelAI').addEventListener('click', () => this.closeAIModal());
+                document.getElementById('generateContent').addEventListener('click', () => this.generateAIContent());
+
+                // E-commerce
+                document.getElementById('addProduct').addEventListener('click', () => this.showProductModal());
+                document.getElementById('productForm').addEventListener('submit', (e) => this.addProduct(e));
 
                 // Edit modal
                 document.getElementById('cancelEdit').addEventListener('click', () => this.closeEditModal());
@@ -227,7 +347,7 @@
 
             createComponent(type, id, data = {}) {
                 const div = document.createElement('div');
-                div.className = 'component';
+                div.className = 'component relative mb-4';
                 div.setAttribute('data-id', id);
                 div.setAttribute('data-type', type);
 
@@ -459,40 +579,6 @@
                             { type: 'contact', data: { title: 'Visit Our Bakery' } },
                             { type: 'footer', data: { businessName: 'Sweet Dreams Bakery' } }
                         ]
-                    },
-                    gym: {
-                        components: [
-                            { type: 'navbar', data: { brandName: 'FitLife Gym', menuItems: ['Home', 'Classes', 'Memberships', 'Trainers', 'Contact'] } },
-                            { type: 'hero', data: { title: 'Transform Your Body', subtitle: 'State-of-the-art equipment and expert trainers to help you reach your goals', bgColor: 'bg-gradient-to-r from-red-600 to-orange-600' } },
-                            { type: 'services', data: { 
-                                title: 'Our Programs',
-                                services: [
-                                    { name: 'Personal Training', description: '1-on-1 training with certified professionals', icon: 'fas fa-dumbbell' },
-                                    { name: 'Group Classes', description: 'High-energy group fitness classes', icon: 'fas fa-users' },
-                                    { name: 'Nutrition Coaching', description: 'Meal planning and nutrition guidance', icon: 'fas fa-apple-alt' }
-                                ]
-                            }},
-                            { type: 'gallery', data: {} },
-                            { type: 'contact', data: { title: 'Start Your Fitness Journey' } },
-                            { type: 'footer', data: { businessName: 'FitLife Gym' } }
-                        ]
-                    },
-                    coaching: {
-                        components: [
-                            { type: 'navbar', data: { brandName: 'Excel Academy', menuItems: ['Home', 'Courses', 'Faculty', 'Results', 'Contact'] } },
-                            { type: 'hero', data: { title: 'Excellence in Education', subtitle: 'Expert coaching for competitive exams and academic success', bgColor: 'bg-gradient-to-r from-blue-600 to-indigo-600' } },
-                            { type: 'services', data: { 
-                                title: 'Our Courses',
-                                services: [
-                                    { name: 'JEE Preparation', description: 'Comprehensive coaching for engineering entrance', icon: 'fas fa-calculator' },
-                                    { name: 'NEET Coaching', description: 'Medical entrance exam preparation', icon: 'fas fa-stethoscope' },
-                                    { name: 'Academic Support', description: 'Board exam preparation and tutoring', icon: 'fas fa-book' }
-                                ]
-                            }},
-                            { type: 'gallery', data: {} },
-                            { type: 'contact', data: { title: 'Enroll Today' } },
-                            { type: 'footer', data: { businessName: 'Excel Academy' } }
-                        ]
                     }
                 };
 
@@ -520,17 +606,84 @@
                 }
             }
 
+            showAIModal() {
+                document.getElementById('aiModal').classList.remove('hidden');
+                document.getElementById('aiModal').classList.add('flex');
+            }
+
+            closeAIModal() {
+                document.getElementById('aiModal').classList.add('hidden');
+                document.getElementById('aiModal').classList.remove('flex');
+            }
+
+            showProductModal() {
+                document.getElementById('productModal').classList.remove('hidden');
+                document.getElementById('productModal').classList.add('flex');
+            }
+
+            closeProductModal() {
+                document.getElementById('productModal').classList.add('hidden');
+                document.getElementById('productModal').classList.remove('flex');
+                document.getElementById('productForm').reset();
+            }
+
+            addProduct(e) {
+                e.preventDefault();
+                const product = {
+                    name: document.getElementById('productName').value,
+                    description: document.getElementById('productDescription').value,
+                    price: parseFloat(document.getElementById('productPrice').value),
+                    category: document.getElementById('productCategory').value
+                };
+
+                this.products.push(product);
+                this.renderProducts();
+                this.closeProductModal();
+                
+                // Show success message
+                this.showNotification('Product added successfully!', 'success');
+            }
+
+            renderProducts() {
+                const container = document.getElementById('productsList');
+                if (this.products.length === 0) {
+                    container.innerHTML = '<p class="text-sm text-gray-600 text-center">No products added yet</p>';
+                    return;
+                }
+
+                container.innerHTML = this.products.map((product, index) => `
+                    <div class="product-item">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-semibold">${product.name}</h4>
+                                <p class="text-sm text-gray-600">${product.description}</p>
+                                <p class="text-green-600 font-bold">$${product.price}</p>
+                                <span class="text-xs bg-gray-100 px-2 py-1 rounded">${product.category}</span>
+                            </div>
+                            <button onclick="builder.removeProduct(${index})" class="text-red-500 hover:text-red-700">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            removeProduct(index) {
+                this.products.splice(index, 1);
+                this.renderProducts();
+                this.showNotification('Product removed successfully!', 'success');
+            }
+
             editComponent(element) {
                 if (this.isPreviewMode) return;
                 
                 this.currentEditingElement = element;
                 const type = element.getAttribute('data-type');
-                const id = element.getAttribute('data-id');
                 
-                this.showEditModal(type, this.componentData[id] || {});
+                this.showEditModal(type);
             }
 
-            showEditModal(type, data) {
+            showEditModal(type) {
                 const modal = document.getElementById('editModal');
                 const form = document.getElementById('editForm');
                 
@@ -541,11 +694,7 @@
                         formHTML = `
                             <div class="mb-4">
                                 <label class="block text-sm font-medium mb-2">Brand Name</label>
-                                <input type="text" id="brandName" value="${data.brandName || ''}" class="w-full p-2 border rounded">
-                            </div>
-                            <div class="mb-4">
-                                <label class="block text-sm font-medium mb-2">Menu Items (comma separated)</label>
-                                <input type="text" id="menuItems" value="${(data.menuItems || []).join(', ')}" class="w-full p-2 border rounded">
+                                <input type="text" id="editBrandName" class="w-full p-2 border rounded" placeholder="Your Business Name">
                             </div>
                         `;
                         break;
@@ -553,20 +702,100 @@
                         formHTML = `
                             <div class="mb-4">
                                 <label class="block text-sm font-medium mb-2">Title</label>
-                                <input type="text" id="title" value="${data.title || ''}" class="w-full p-2 border rounded">
+                                <input type="text" id="editTitle" class="w-full p-2 border rounded" placeholder="Welcome to Our Business">
                             </div>
                             <div class="mb-4">
                                 <label class="block text-sm font-medium mb-2">Subtitle</label>
-                                <input type="text" id="subtitle" value="${data.subtitle || ''}" class="w-full p-2 border rounded">
-                            </div>
-                            <div class="mb-4">
-                                <label class="block text-sm font-medium mb-2">Background Color</label>
-                                <select id="bgColor" class="w-full p-2 border rounded">
-                                    <option value="bg-gradient-to-r from-blue-600 to-purple-600">Blue to Purple</option>
-                                    <option value="bg-gradient-to-r from-pink-500 to-purple-600">Pink to Purple</option>
-                                    <option value="bg-gradient-to-r from-orange-500 to-red-500">Orange to Red</option>
-                                    <option value="bg-gradient-to-r from-green-500 to-blue-500">Green to Blue</option>
-                                </select>
+                                <input type="text" id="editSubtitle" class="w-full p-2 border rounded" placeholder="We provide excellent services">
                             </div>
                         `;
                         break;
+                }
+
+                form.innerHTML = formHTML;
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+
+            closeEditModal() {
+                document.getElementById('editModal').classList.add('hidden');
+                document.getElementById('editModal').classList.remove('flex');
+            }
+
+            saveComponentEdit() {
+                // Implementation for saving edits
+                this.showNotification('Changes saved successfully!', 'success');
+                this.closeEditModal();
+            }
+
+            clearCanvas() {
+                this.canvas.innerHTML = `
+                    <div class="text-center text-gray-400 mt-20">
+                        <i class="fas fa-plus-circle text-4xl mb-4"></i>
+                        <p class="text-lg">Drag components here to build your website</p>
+                        <p class="text-sm">Or select a template to get started</p>
+                    </div>
+                `;
+                this.showNotification('Canvas cleared!', 'info');
+            }
+
+            saveLayout() {
+                // Simulate saving layout
+                this.showNotification('Layout saved successfully!', 'success');
+            }
+
+            publishWebsite() {
+                // Simulate publishing
+                this.showNotification('Website published successfully!', 'success');
+            }
+
+            optimizeWithAI() {
+                this.showNotification('AI optimization suggestions generated!', 'info');
+            }
+
+            generateAIContent() {
+                this.showNotification('AI content generation started!', 'info');
+                this.closeAIModal();
+            }
+
+            showNotification(message, type = 'info') {
+                // Create notification element
+                const notification = document.createElement('div');
+                notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
+                    type === 'success' ? 'bg-green-500' : 
+                    type === 'error' ? 'bg-red-500' : 
+                    'bg-blue-500'
+                } text-white`;
+                notification.innerHTML = `
+                    <div class="flex items-center">
+                        <i class="fas fa-${
+                            type === 'success' ? 'check' : 
+                            type === 'error' ? 'exclamation' : 
+                            'info'
+                        } mr-2"></i>
+                        <span>${message}</span>
+                    </div>
+                `;
+
+                document.body.appendChild(notification);
+
+                // Remove after 3 seconds
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+            }
+
+            getBusinessType() {
+                return 'General Business'; // This would be dynamic in a real app
+            }
+        }
+
+        // Initialize the application when the page loads
+        let builder;
+        document.addEventListener('DOMContentLoaded', () => {
+            builder = new WebsiteBuilder();
+            window.builder = builder; // Make it globally available for onclick handlers
+        });
+    </script>
+</body>
+</html>
